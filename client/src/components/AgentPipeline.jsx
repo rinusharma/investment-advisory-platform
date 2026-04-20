@@ -67,6 +67,48 @@ function animateStep(agentId, step, fromProgress, setAgents, timers) {
   });
 }
 
+// ─── Portfolio Analysis — LLM fetch with mock fallback ───────────────────────
+//
+// Fires concurrently with the Agent 1 animation so the API round-trip is
+// hidden behind the ~4.5 s progress bar.  On any error the mock result is
+// returned unchanged, keeping all downstream agents (Risk, Recommendation)
+// working exactly as before.
+//
+// NOTE: holdingsIdentified is kept as the mock ARRAY from generatePortfolioResult
+// because generateRiskResult (Agent 2) iterates over it.  The LLM returns a
+// count; we surface that via the separate diversificationScore / riskFlags fields.
+
+async function fetchPortfolioAnalysis(stage1Data, fallback) {
+  try {
+    const notes     = stage1Data?.notes ?? '';
+    const filesText = (stage1Data?.files ?? []).map((f) => f.name).join(', ');
+
+    const res = await fetch('/api/portfolio-analysis', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ notes, filesText }),
+    });
+
+    if (!res.ok) return fallback;
+
+    const json = await res.json();
+    if (!json.success || !json.data) return fallback;
+
+    const llm = json.data;
+
+    // Merge LLM metrics into the mock structure; preserve holdingsIdentified array.
+    return {
+      ...fallback,
+      documentsAnalyzed:    typeof llm.documentsAnalyzed    === 'number' ? llm.documentsAnalyzed    : fallback.documentsAnalyzed,
+      diversificationScore: typeof llm.diversificationScore === 'number' ? llm.diversificationScore : fallback.diversificationScore,
+      riskFlags:            Array.isArray(llm.riskFlags)                 ? llm.riskFlags             : [],
+      summary:              typeof llm.summary              === 'string'  ? llm.summary              : '',
+    };
+  } catch {
+    return fallback;
+  }
+}
+
 // ─── Pipeline runner ──────────────────────────────────────────────────────────
 //
 // Pure async function — receives React setters and a local alive() closure.
@@ -103,10 +145,12 @@ async function runPipeline(stage1Data, riskProfile, setAgents, setStage3Analysis
   console.log('[Pipeline] Started');
 
   // Agent 1 — Portfolio Analysis (weight 25%)
+  // Start the LLM call immediately so it runs concurrently with the animation.
+  const portfolioFetch = fetchPortfolioAnalysis(stage1Data, generatePortfolioResult(stage1Data));
   await runAgent('portfolio', AGENT_STEPS.portfolio);
   if (!alive()) { console.log('[Pipeline] Cancelled — after Agent 1'); return; }
 
-  const portfolioResult = generatePortfolioResult(stage1Data);
+  const portfolioResult = await portfolioFetch;
   setAgents((prev) => ({
     ...prev,
     portfolio: { ...prev.portfolio, status: 'complete', progress: 100, result: portfolioResult },

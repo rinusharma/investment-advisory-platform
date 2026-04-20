@@ -1,86 +1,157 @@
-# Investment Advisory Platform
+# 💼 Investment Advisory App
 
-Full-stack scaffold — React (Vite) + TailwindCSS frontend, Node.js / Express backend.
-
----
-
-## Project Structure
-
-```
-InvestmentAdvisoryApp/
-├── client/                   # React + Vite + TailwindCSS
-│   ├── src/
-│   │   ├── components/
-│   │   │   └── ServerStatusCard.jsx
-│   │   ├── pages/
-│   │   │   └── HomePage.jsx
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── index.html
-│   ├── vite.config.js        # Dev proxy → backend :5000
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   └── package.json
-│
-├── server/                   # Node.js + Express
-│   ├── routes/
-│   │   └── health.js         # GET /api/health
-│   ├── index.js
-│   └── package.json
-│
-└── README.md
-```
+An AI-powered multi-stage investment advisory application that guides financial advisors through client analysis and portfolio recommendations.
 
 ---
 
-## Local Setup
+## 🚀 Features
 
-### 1 — Install dependencies
+* 📊 Client Profile Analysis
+* 🤖 AI-driven Portfolio Evaluation
+* 🔄 Toggle between Mock and LLM modes
+* 📈 Investment Recommendations
+* 🧩 Multi-stage advisory workflow
+
+---
+
+## 🧠 Application Flow
+
+1. Advisor enters client details
+2. Client profile is processed
+3. Portfolio data is analyzed
+4. AI generates insights (Mock / LLM)
+5. Recommendations are displayed
+
+---
+
+## 🔄 Analysis Mode (Mock vs LLM)
+
+The application supports two execution modes:
+
+### 🟢 Mock Mode (Development)
+
+Uses predefined responses for faster testing.
+
+
+set ANALYSIS_MODE=mock
+npm run dev
+
+
+
+
+### 🔵 LLM Mode (AI-powered)
+
+Uses a Large Language Model for real analysis.
+
+
+set ANALYSIS_MODE=llm
+npm run dev
+
+
+
+
+### ⚙️ How It Works
+
+* Backend reads `ANALYSIS_MODE`
+* `mock` → returns static data
+* `llm` → calls AI model for analysis
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+* React.js
+
+### Backend
+
+* Node.js
+* Express.js
+
+### AI Integration
+
+* LLM API (for portfolio analysis)
+
+---
+
+## 📁 Project Structure
+
+
+client/
+  ├── src/components/AgentPipeline.jsx
+  ├── src/pages/ClientProfileStage.jsx
+
+server/
+  ├── index.js
+  ├── routes/portfolioAnalysis.js
+
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone the repository
 
 ```bash
-# Backend
-cd server
-npm install
+git clone https://github.com/rinusharma/portfolio-website.git
+cd InvestmentAdvisoryApp
 
-# Frontend
-cd ../client
-npm install
-```
 
-### 2 — Run in development (two terminals)
+---
 
-**Terminal 1 — backend**
+### 2. Install dependencies
 
-```bash
-cd server
-npm run dev          # nodemon, port 5000
-```
-
-**Terminal 2 — frontend**
+#### Frontend
 
 ```bash
 cd client
-npm run dev          # Vite, port 5173
+npm install
 ```
 
-Open **http://localhost:5173** in your browser.  
-The frontend fetches `GET /api/health` via the Vite dev proxy and displays the response.
+#### Backend
+
+```bash
+cd ../server
+npm install
+```
 
 ---
 
-## API Endpoints
+### 3. Run the application
 
-| Method | Path         | Description           |
-|--------|--------------|-----------------------|
-| GET    | /api/health  | Returns server status |
+#### Start backend
 
-Sample response:
-
-```json
-{
-  "status": "ok",
-  "message": "Server is running",
-  "timestamp": "2026-04-17T10:00:00.000Z"
-}
+```bash
+npm run dev
 ```
+
+#### Start frontend
+
+```bash
+cd ../client
+npm start
+```
+
+---
+
+## 🔑 Key Components
+
+* **AgentPipeline.jsx** → Controls multi-stage AI workflow
+* **ClientProfileStage.jsx** → Handles client input
+* **portfolioAnalysis.js** → Backend logic for analysis
+
+---
+
+## 📌 Future Enhancements
+
+* Authentication & user sessions
+* Advanced portfolio optimization
+* Better UI/UX
+* Deployment (Vercel / AWS)
+
+
+
+## Author
+
+Rinu Sharma

@@ -60,6 +60,18 @@ export default function ClientProfileStage({ onBack, onNext }) {
       }
 
       // Persist Stage 1 data to shared context, then advance
+      console.log(
+        'Stage 1: Client Ingestion Output',
+        JSON.stringify(
+          {
+            files: files.map(f => ({ name: f.name, size: f.size, type: f.type })),
+            notes,
+            uploadResult
+          },
+          null,
+          2
+        )
+      );
       setStage1Data({ files, notes, uploadResult: uploadResult });
       onNext();
     } catch (err) {
